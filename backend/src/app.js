@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const { initializeDatabase } = require("./config/database");
 const dataRoutes = require("./routes/dataRoutes");
 const csvImporter = require("./utils/csvImporter");
@@ -26,6 +27,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve static files from React build (in production)
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../public")));
+}
+
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.json({
@@ -39,13 +45,20 @@ app.get("/health", (req, res) => {
 // Mount API routes
 app.use("/api", dataRoutes);
 
-// Handle unknown routes
-app.use("*", (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Endpoint not found",
+// Serve React app for any non-API routes (in production)
+if (process.env.NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/index.html"));
   });
-});
+} else {
+  // Handle unknown routes in development
+  app.use("*", (req, res) => {
+    res.status(404).json({
+      success: false,
+      message: "Endpoint not found",
+    });
+  });
+}
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -73,6 +86,9 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`API: http://localhost:${PORT}/api`);
+      if (process.env.NODE_ENV === "production") {
+        console.log(`Frontend: http://localhost:${PORT}`);
+      }
     });
   } catch (error) {
     console.error("Startup failed:", error.message);

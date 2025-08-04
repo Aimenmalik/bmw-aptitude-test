@@ -1,0 +1,36 @@
+{
+    "name": "bmw-aptitude-test",
+    "version": "1.0.0",
+    "description": "BMW IT Internship - Generic DataGrid Application",
+    "main": "backend/src/app.js",
+    "scripts": {
+      "start": "npm run start:backend",
+      "start:backend": "cd backend && npm start",
+      "start:frontend": "cd frontend && npm start",
+      "build": "npm run build:frontend",
+      "build:frontend": "cd frontend && npm run build",
+      "install:backend": "cd backend && npm install",
+      "install:frontend": "cd frontend && npm install",
+      "install:all": "npm run install:backend && npm run install:frontend",
+      "dev:backend": "cd backend && npm run dev",
+      "dev:frontend": "cd frontend && npm start"
+    },
+    "engines": {
+      "node": ">=18.0.0",
+      "npm": ">=8.0.0"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/yourusername/bmw-aptitude-test.git"
+    },
+    "keywords": [
+      "bmw",
+      "aptitude-test",
+      "react",
+      "nodejs",
+      "ag-grid",
+      "material-ui"
+    ],
+    "author": "Your Name",
+    "license": "ISC"
+  }

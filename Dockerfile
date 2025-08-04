@@ -34,10 +34,6 @@ COPY backend/ ./
 # Copy built frontend from previous stage
 COPY --from=frontend-build /app/frontend/build ./public
 
-# Create data directory and copy CSV file
-RUN mkdir -p ./data
-COPY BMW_Aptitude_Test_Test_Data_ElectricCarData.csv ./data/
-
 # Expose port
 EXPOSE 3001
 

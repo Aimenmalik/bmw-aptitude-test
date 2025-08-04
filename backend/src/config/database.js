@@ -1,15 +1,12 @@
 const mysql = require("mysql2/promise");
 require("dotenv").config();
 
-// Updated to handle Railway's MySQL environment variables
 const dbConfig = {
-  host: process.env.MYSQL_HOST || process.env.DB_HOST || "localhost",
-  port: process.env.MYSQL_PORT || process.env.DB_PORT || 3306,
-  user: process.env.MYSQL_USER || process.env.DB_USER || "bmw_user",
-  password:
-    process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD || "Bmw_root_2025",
-  database:
-    process.env.MYSQL_DATABASE || process.env.DB_NAME || "bmw_electric_cars",
+  host: process.env.DB_HOST || "localhost",
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER || "bmw_user",
+  password: process.env.DB_PASSWORD || "Bmw_root_2025",
+  database: process.env.DB_NAME || "bmw_electric_cars",
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -24,7 +21,6 @@ async function testConnection() {
     const connection = await pool.getConnection();
     await connection.ping();
     connection.release();
-    console.log("Database connection test successful");
     return true;
   } catch (error) {
     console.error("Database connection test failed:", error.message);
@@ -35,30 +31,21 @@ async function testConnection() {
 async function initializeDatabase() {
   let connection;
   try {
-    // For Railway, skip database creation (it's already provided)
-    if (process.env.MYSQL_HOST) {
-      console.log(
-        "Railway environment detected - connecting to existing database"
-      );
-      connection = await pool.getConnection();
-    } else {
-      // Local development - create database if needed
-      console.log("Local environment detected - ensuring database exists");
-      const tempConfig = { ...dbConfig };
-      delete tempConfig.database;
-      const tempPool = mysql.createPool(tempConfig);
-      connection = await tempPool.getConnection();
+    // Connect without database name to create it if needed
+    const tempConfig = { ...dbConfig };
+    delete tempConfig.database;
+    const tempPool = mysql.createPool(tempConfig);
+    connection = await tempPool.getConnection();
 
-      await connection.execute(
-        `CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-      );
-      console.log(`Database '${dbConfig.database}' ready`);
+    await connection.execute(
+      `CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+    );
+    console.log(`Database '${dbConfig.database}' ready`);
 
-      connection.release();
-      await tempPool.end();
+    connection.release();
+    await tempPool.end();
 
-      connection = await pool.getConnection();
-    }
+    connection = await pool.getConnection();
 
     // Table schema with indexes for common query patterns
     const createTableQuery = `

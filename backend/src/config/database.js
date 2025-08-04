@@ -24,6 +24,7 @@ async function testConnection() {
     const connection = await pool.getConnection();
     await connection.ping();
     connection.release();
+    console.log("Database connection test successful");
     return true;
   } catch (error) {
     console.error("Database connection test failed:", error.message);
@@ -42,6 +43,7 @@ async function initializeDatabase() {
       connection = await pool.getConnection();
     } else {
       // Local development - create database if needed
+      console.log("Local environment detected - ensuring database exists");
       const tempConfig = { ...dbConfig };
       delete tempConfig.database;
       const tempPool = mysql.createPool(tempConfig);
